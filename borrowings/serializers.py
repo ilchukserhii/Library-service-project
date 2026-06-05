@@ -1,3 +1,4 @@
+from django.db.models import ForeignKey
 from django.utils import timezone
 from rest_framework import serializers
 
@@ -43,3 +44,18 @@ class BorrowingWriteSerializer(serializers.ModelSerializer):
             )
 
         return attrs
+
+
+class BorrowingAdminSerializer(serializers.ModelSerializer):
+    book = BookSerializer(read_only=True)
+
+    class Meta:
+        model = Borrowing
+        fields = (
+            "id",
+            "borrow_date",
+            "expected_return_date",
+            "actual_return_date",
+            "book",
+            "user"
+        )
