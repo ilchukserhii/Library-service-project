@@ -8,8 +8,10 @@ from books.serializers import BookSerializer
 
 BOOK_LIST_URL = reverse("books:book-list")
 
+
 def detail_url(book_id):
     return reverse("books:book-detail", args=[book_id])
+
 
 def sample_book(**params):
     defaults = {
@@ -21,6 +23,7 @@ def sample_book(**params):
     }
     defaults.update(params)
     return Book.objects.create(**defaults)
+
 
 class BookUnauthenticatedViewTest(TestCase):
     def setUp(self):
@@ -101,7 +104,6 @@ class BookAdminViewTest(TestCase):
         response = self.client.post(BOOK_LIST_URL, payload)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
 
     def test_update_book(self):
         book = sample_book()

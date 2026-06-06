@@ -1,4 +1,3 @@
-from django.db.models import ForeignKey
 from django.utils import timezone
 from rest_framework import serializers
 

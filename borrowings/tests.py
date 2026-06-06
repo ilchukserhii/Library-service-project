@@ -12,12 +12,18 @@ from rest_framework.test import APIClient
 
 from books.models import Book
 from borrowings.models import Borrowing
-from borrowings.serializers import BorrowingWriteSerializer, BorrowingReadSerializer, BorrowingAdminSerializer
+from borrowings.serializers import (
+    BorrowingWriteSerializer,
+    BorrowingReadSerializer,
+    BorrowingAdminSerializer
+)
 
 BORROWINGS_LIST_URL = reverse("borrowings:borrowings-list")
 
+
 def detail_url(borrowing_id):
     return reverse("borrowings:borrowings-detail", args=[borrowing_id])
+
 
 def sample_book(**params):
     defaults = {
@@ -29,6 +35,7 @@ def sample_book(**params):
     }
     defaults.update(params)
     return Book.objects.create(**defaults)
+
 
 def sample_user(**params):
     defaults = {
@@ -110,6 +117,7 @@ class BorrowingAnautorizedViewTest(TestCase):
         response = self.client.get(BORROWINGS_LIST_URL)
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class BorrowingAuthenticatedUserViewTest(TestCase):
     def setUp(self):
@@ -214,7 +222,12 @@ class BorrowingAuthenticatedUserViewTest(TestCase):
         book.refresh_from_db()
         self.assertEqual(book.inventory, 9)
         borrow = Borrowing.objects.get()
-        response = self.client.post(reverse("borrowings:borrowings-return-book", args=[borrow.id]))
+        response = self.client.post(
+            reverse(
+                "borrowings:borrowings-return-book",
+                args=[borrow.id]
+            )
+        )
         book.refresh_from_db()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(book.inventory, 10)
@@ -231,8 +244,18 @@ class BorrowingAuthenticatedUserViewTest(TestCase):
         book.refresh_from_db()
         self.assertEqual(book.inventory, 9)
         borrow = Borrowing.objects.get()
-        self.client.post(reverse("borrowings:borrowings-return-book", args=[borrow.id]))
-        response = self.client.post(reverse("borrowings:borrowings-return-book", args=[borrow.id]))
+        self.client.post(
+            reverse(
+                "borrowings:borrowings-return-book",
+                args=[borrow.id]
+            )
+        )
+        response = self.client.post(
+            reverse(
+                "borrowings:borrowings-return-book",
+                args=[borrow.id]
+            )
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
