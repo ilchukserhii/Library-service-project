@@ -1,3 +1,4 @@
+import asyncio
 from django.utils import timezone
 from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
@@ -6,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from borrowings.models import Borrowing
+from borrowings.send_telegram_notification import send_telegram_notification
 from borrowings.serializers import (
     BorrowingReadSerializer,
     BorrowingWriteSerializer,
@@ -58,10 +60,11 @@ class BorrowingsView(
         book.save()
         book.refresh_from_db()
 
-        serializer.save(
+        borrow = serializer.save(
             user=self.request.user,
             borrow_date=timezone.localdate(),
         )
+        asyncio.run(send_telegram_notification(borrow))
 
     @action(detail=True, methods=["post"], url_path="return")
     def return_book(self, request, pk=None):
