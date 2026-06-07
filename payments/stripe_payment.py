@@ -11,8 +11,24 @@ client = stripe.StripeClient(os.getenv("STRIPE_KEY"))
 
 
 def create_payment_for_borrowing(borrow, request):
-    success_url = request.build_absolute_uri(reverse("payments:success"))
-    cancel_url = request.build_absolute_uri(reverse("payments:cancel"))
+    amount = borrow.calculate_price
+    payment_type = "PAYMENT"
+    create_stripe_payment_session(borrow, request, amount, payment_type)
+
+
+def create_fine_payment_for_borrowing(borrow, request):
+    amount = borrow.calculate_fine_price
+    payment_type = "FINE"
+    create_stripe_payment_session(borrow, request, amount, payment_type)
+
+
+def create_stripe_payment_session(borrow, request, amount, payment_type):
+    success_url = request.build_absolute_uri(
+        reverse("payments:payments-success")
+    )
+    cancel_url = request.build_absolute_uri(
+        reverse("payments:payments-cancel")
+    )
     session = client.v1.checkout.sessions.create(
         params={
             "line_items": [{
@@ -21,7 +37,7 @@ def create_payment_for_borrowing(borrow, request):
                     "product_data": {
                         "name": f"Borrowing: {borrow.id}",
                     },
-                    "unit_amount": int(borrow.calculate_price * 100),
+                    "unit_amount": int(amount * 100),
                 },
                 "quantity": 1,
             }],
@@ -32,9 +48,9 @@ def create_payment_for_borrowing(borrow, request):
     )
     Payment.objects.create(
       status="PENDING",
-      type="PAYMENT",
+      type=payment_type,
       borrowings=borrow,
       session_url=session.url,
       session_id=session.id,
-      money_to_pay=borrow.calculate_price
+      money_to_pay=amount
     )
