@@ -65,7 +65,7 @@ class BorrowingsView(
             user=self.request.user,
             borrow_date=timezone.localdate(),
         )
-        create_payment_for_borrowing(borrow)
+        create_payment_for_borrowing(borrow, self.request)
         asyncio.run(send_telegram_notification(borrow))
 
     @action(detail=True, methods=["post"], url_path="return")
