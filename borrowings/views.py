@@ -13,6 +13,7 @@ from borrowings.serializers import (
     BorrowingWriteSerializer,
     BorrowingAdminSerializer
 )
+from payments.stripe_payment import create_payment_for_borrowing
 
 
 class BorrowingsView(
@@ -64,6 +65,7 @@ class BorrowingsView(
             user=self.request.user,
             borrow_date=timezone.localdate(),
         )
+        create_payment_for_borrowing(borrow)
         asyncio.run(send_telegram_notification(borrow))
 
     @action(detail=True, methods=["post"], url_path="return")

@@ -22,6 +22,11 @@ class Borrowing(models.Model):
         related_name="borrowings",
     )
 
+    @property
+    def calculate_price(self):
+        period = (self.expected_return_date - self.borrow_date).days
+        return period * self.book.daily_fee
+
     class Meta:
         constraints = [
             models.CheckConstraint(
