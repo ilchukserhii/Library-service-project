@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "debug_toolbar",
+    "django_q",
     "books",
     "users",
     "borrowings",
@@ -142,4 +143,11 @@ SIMPLE_JWT = {
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZE",
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}
+
+Q_CLUSTER = {
+    "name": "library_q_project",
+    "workers": 2,
+    "timeout": 60,
+    "orm": "default",
 }
