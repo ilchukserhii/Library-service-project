@@ -24,9 +24,11 @@ class PaymentsView(
         return PaymentDetailSerializer
 
     def get_queryset(self):
-        queryset = Payment.objects.all()
+        queryset = Payment.objects.filter(
+            borrowings__user=self.request.user
+        )
 
         if self.request.user.is_staff:
             queryset = Payment.objects.all()
 
-        return queryset.filter(borrowings__user=self.request.user)
+        return queryset
