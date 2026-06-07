@@ -13,7 +13,10 @@ from borrowings.serializers import (
     BorrowingWriteSerializer,
     BorrowingAdminSerializer
 )
-from payments.stripe_payment import create_payment_for_borrowing
+from payments.stripe_payment import (
+    create_payment_for_borrowing,
+    create_fine_payment_for_borrowing
+)
 
 
 class BorrowingsView(
@@ -77,6 +80,8 @@ class BorrowingsView(
                 status=status.HTTP_400_BAD_REQUEST,
             )
         borrowing.actual_return_date = timezone.localdate()
+        if borrowing.actual_return_date > borrowing.expected_return_date:
+            create_fine_payment_for_borrowing(borrowing, self.request)
         borrowing.book.inventory += 1
         borrowing.book.save()
         borrowing.save()

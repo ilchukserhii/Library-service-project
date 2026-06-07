@@ -152,3 +152,5 @@ Q_CLUSTER = {
     "timeout": 60,
     "orm": "default",
 }
+
+FINE_MULTIPLIER = 2
