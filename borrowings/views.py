@@ -1,5 +1,10 @@
 import asyncio
 from django.utils import timezone
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiParameter, OpenApiResponse
+)
 from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -48,6 +53,26 @@ class BorrowingsView(
 
         return queryset
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="user_id",
+                type=OpenApiTypes.INT,
+                description=(
+                    "Only for admin users: filter borrowings by user_id, "
+                    "ex. ?user_id=1"
+                ),
+            ),
+            OpenApiParameter(
+                name="is_active",
+                type=OpenApiTypes.BOOL,
+                description="Filter borrowings by active, ex. ?is_active=true",
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
     def get_serializer_class(self):
         if self.action == "create":
             return BorrowingWriteSerializer
@@ -71,6 +96,22 @@ class BorrowingsView(
         create_payment_for_borrowing(borrow, self.request)
         asyncio.run(send_telegram_notification(borrow))
 
+    @extend_schema(
+        request=None,
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                description="Book returned successfully",
+            ),
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+                description="Borrowing already returned",
+            )
+        },
+        description=(
+            "Returns a borrowed book, sets actual_return_date, "
+            "increases book inventory by 1, and creates a fine payment "
+            "if the book is overdue."
+        ),
+    )
     @action(detail=True, methods=["post"], url_path="return")
     def return_book(self, request, pk=None):
         borrowing = self.get_object()

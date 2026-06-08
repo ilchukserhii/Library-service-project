@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "debug_toolbar",
     "django_q",
+    "drf_spectacular",
     "books",
     "users",
     "borrowings",
@@ -138,6 +139,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS":
             "rest_framework.pagination.PageNumberPagination",
         "PAGE_SIZE": 10,
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SIMPLE_JWT = {
@@ -154,3 +156,15 @@ Q_CLUSTER = {
 }
 
 FINE_MULTIPLIER = 2
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Library API",
+    "DESCRIPTION": (
+        "Library API for users to borrow books, pay for reservations, "
+        "and manage their payments. Administrators can manage book "
+        "inventory, view borrowings, and track users' payment statuses."
+
+    ),
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}

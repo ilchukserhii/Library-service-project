@@ -2,7 +2,8 @@ import os
 
 import stripe
 from dotenv import load_dotenv
-from rest_framework import mixins, viewsets
+from drf_spectacular.utils import extend_schema, OpenApiResponse
+from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -44,6 +45,18 @@ class PaymentsView(
 
         return queryset
 
+    @extend_schema(
+        request=None,
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                description="Payment status",
+            )
+        },
+        description=(
+                "If payment was successful, "
+                "payment status will be set to 'PAID'"
+        )
+    )
     @action(detail=False, methods=["get"])
     def success(self, request):
         session_id = request.query_params.get("session_id")
@@ -58,6 +71,21 @@ class PaymentsView(
 
         return Response({"status": payment.status})
 
+    @extend_schema(
+        request=None,
+        responses={
+            OpenApiResponse(
+                description=(
+                        "Payment can be made later. "
+                        "Session is available for 24 hours."
+                )
+            )
+        },
+        description=(
+                "If payment was canceled it "
+                "will be available for 24 hours."
+        )
+    )
     @action(detail=False, methods=["get"])
     def cancel(self, request):
         return Response(
