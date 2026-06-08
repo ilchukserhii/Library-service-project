@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, extend_schema_field
 from rest_framework import serializers
 
 from payments.models import Payment
@@ -28,7 +30,7 @@ class PaymentDetailSerializer(serializers.ModelSerializer):
             "money_to_pay"
         )
 
-    def get_borrowings(self, obj):
+    def get_borrowings(self, obj) -> dict:
         borrowing = obj.borrowings
 
         return {
