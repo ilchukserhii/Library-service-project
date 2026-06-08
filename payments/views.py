@@ -74,7 +74,7 @@ class PaymentsView(
     @extend_schema(
         request=None,
         responses={
-            OpenApiResponse(
+            status.HTTP_200_OK: OpenApiResponse(
                 description=(
                         "Payment can be made later. "
                         "Session is available for 24 hours."

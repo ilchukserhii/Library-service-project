@@ -42,3 +42,5 @@ htmlcov/
 
 media/*
 !media/.gitkeep
+
+.data/

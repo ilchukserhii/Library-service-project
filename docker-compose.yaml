@@ -1,0 +1,42 @@
+services:
+  app:
+    build:
+      context: .
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
+      - library:/app/static
+    command: >
+      sh -c "python manage.py wait_for_db &&
+             python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17-alpine
+    volumes:
+      - .data/db:/var/lib/postgresql/data
+    env_file:
+      - .env
+    restart: always
+
+  django-q:
+    build:
+      context: .
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    command: >
+      sh -c "python manage.py wait_for_db &&
+             python manage.py qcluster"
+    depends_on:
+      - db
+
+volumes:
+  library:
