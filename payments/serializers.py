@@ -16,6 +16,8 @@ class PaymentListSerializer(serializers.ModelSerializer):
 
 
 class PaymentDetailSerializer(serializers.ModelSerializer):
+    borrowings = serializers.SerializerMethodField()
+
     class Meta:
         model = Payment
         fields = (
@@ -25,3 +27,13 @@ class PaymentDetailSerializer(serializers.ModelSerializer):
             "borrowings",
             "money_to_pay"
         )
+
+    def get_borrowings(self, obj):
+        borrowing = obj.borrowings
+
+        return {
+            "borrow_date": borrowing.borrow_date,
+            "expected_return_date": borrowing.expected_return_date,
+            "actual_return_date": borrowing.actual_return_date,
+            "book": borrowing.book.title,
+        }
